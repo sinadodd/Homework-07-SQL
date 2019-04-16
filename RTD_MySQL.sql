@@ -90,6 +90,7 @@ join staff s
 on p.staff_id = s.staff_id
 where p.payment_date LIKE '2005-08-%'
 group by p.staff_id;
+/* Another way to get the date is to use BETWEEN or > and < since the data type is datetime. */
 
 -- 6c. List each film and the number of actors who are listed for that film. Use tables 
 -- film_actor and film. Use inner join.
@@ -109,7 +110,7 @@ group by f.title;
 
 -- 6e. Using the tables payment and customer and the JOIN command, list the total paid by 
 -- each customer. List the customers alphabetically by last name:
-select c.last_name as 'Last Name', c.first_name, sum(p.amount) as 'Total Paid'
+select c.last_name as 'Last Name', c.first_name as 'First Name', sum(p.amount) as 'Total Paid'
 from customer c
 join payment p
 on c.customer_id = p.customer_id
@@ -165,7 +166,7 @@ join film_category fc
 	on f.film_id = fc.film_id
 join category c
 	on fc.category_id = c.category_id
-	where name = 'Family';
+	where c.name = 'Family';
 
 -- 7e. Display the most frequently rented movies in descending order.
 select f.title, count(f.title) as 'Times Rented'
@@ -182,8 +183,7 @@ select s.store_id, sum(p.amount) as 'Payment Collected'
 from payment p
 join staff s
 	on p.staff_id = s.staff_id
-group by s.store_id
-;
+group by s.store_id;
 
 -- 7g. Write a query to display for each store its store ID, city, and country.
 select s.store_id, c.city, country.country
@@ -193,12 +193,11 @@ join address a
 join city c
 	on a.city_id = c.city_id
 join country
-	on c.country_id = country.country_id
-;
+	on c.country_id = country.country_id;
 
 -- 7h. List the top five genres in gross revenue in descending order. (Hint: you may need to 
 -- use the following tables: category, film_category, inventory, payment, and rental.)
-select c.name, sum(p.amount)
+select c.category_id, c.name as 'Category Name', sum(p.amount) as 'Revenue'
 from category c
 join film_category fc
 	on c.category_id = fc.category_id
@@ -208,7 +207,7 @@ join rental r
 	on i.inventory_id = r.inventory_id
 join payment p
 	on r.rental_id = p.rental_id
-group by c.name
+group by c.category_id
 ORDER BY sum(p.amount) DESC
 LIMIT 5;
 
@@ -216,7 +215,7 @@ LIMIT 5;
 -- Top five genres by gross revenue. Use the solution from the problem above to create a view. 
 -- If you haven't solved 7h, you can substitute another query to create a view.
 CREATE VIEW top_genres AS
-select c.name, sum(p.amount)
+select c.category_id, c.name as 'Category Name', sum(p.amount) as 'Revenue'
 from category c
 join film_category fc
 	on c.category_id = fc.category_id
@@ -226,7 +225,7 @@ join rental r
 	on i.inventory_id = r.inventory_id
 join payment p
 	on r.rental_id = p.rental_id
-group by c.name
+group by c.category_id
 ORDER BY sum(p.amount) DESC
 LIMIT 5;
 
